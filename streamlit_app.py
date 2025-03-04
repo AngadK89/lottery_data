@@ -2,6 +2,8 @@ import streamlit as st
 import pandas as pd
 from lottery import get_stats
 
+st.header("Hi! Come get your lottery numbers!")
+
 if st.button("Get lottery numbers!"):
     (draw, results) = get_stats()
 
