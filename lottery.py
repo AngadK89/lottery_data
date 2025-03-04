@@ -71,6 +71,3 @@ def analyse_data(file, out_file):
 	# Generate most commonly occurring number for each entry.
 	most_freq_balls: pd.DataFrame = sorted_df.mode().iloc[[0]]
 	most_freq_balls.to_csv(out_file, index=False)
-
-
-
