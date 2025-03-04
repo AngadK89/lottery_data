@@ -23,29 +23,42 @@ def get_lottery_type():
 
 # Returns the:
 # 1. Name of the draw. 
-# 2. CSV file where the analysed data is located.
-def get_stats() -> tuple[str, str]:
+# 2. CSV file where the filtered, unanalysed data is located.
+# 3. CSV file where the analysed data is located.
+def get_stats() -> tuple[str, str, str]:
 	draw = get_lottery_type()
     
 	# If it's a Sunday, no draws take place.
 	if not draw:
-		return (None, None)
+		return (None, None, None)
        
 	url = f"https://www.national-lottery.co.uk/results/{draw}/draw-history/csv"
 	data_file = "data.csv"
+	filtered_file = "filtered_data.csv"
 	res_file = "most_freq.csv"
 
-	store_data(url, data_file)
+	store_raw_data(url, data_file)
+	store_filtered_data(data_file, filtered_file)
 	analyse_data(data_file, res_file)
-	return (draw, res_file)
+	return (draw, filtered_file, res_file)
 
 
-def store_data(url: str, data_file: str):
+def store_raw_data(url: str, data_file: str):
 	# Get the data & store it in `data.csv`
 	response = requests.get(url, stream=True)
 
 	with open(data_file, "wb") as file:
 		file.write(response.content)
+	
+def store_filtered_data(in_file: str, out_file: str):
+	df = pd.read_csv(in_file)
+
+	filter_mask = (df.columns == "DrawDate") | \
+				  (df.columns.str.contains("ball", case=False) & df.apply(lambda x: pd.api.types.is_numeric_dtype(x)))
+	
+	filtered_df = df.loc[:, filter_mask]
+	filtered_df.to_csv(out_file, index=False)
+	
 
 def analyse_data(file, out_file):
 	# Extract only only the fields containing the balls.
