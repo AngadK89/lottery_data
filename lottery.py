@@ -38,8 +38,11 @@ def get_stats() -> tuple[str, str, str]:
 	res_file = "most_freq.csv"
 
 	store_raw_data(url, data_file)
+
 	store_filtered_data(data_file, filtered_file)
-	analyse_data(data_file, res_file)
+
+	analyse_data(filtered_file, res_file)
+
 	return (draw, filtered_file, res_file)
 
 
@@ -54,7 +57,7 @@ def store_filtered_data(in_file: str, out_file: str):
 	df = pd.read_csv(in_file)
 
 	filter_mask = (df.columns == "DrawDate") | \
-				  (df.columns.str.contains("ball", case=False) & df.apply(lambda x: pd.api.types.is_numeric_dtype(x)))
+				  (df.columns.str.contains("ball|star", case=False) & df.apply(lambda x: pd.api.types.is_numeric_dtype(x)))
 	
 	filtered_df = df.loc[:, filter_mask]
 	filtered_df.to_csv(out_file, index=False)
@@ -63,10 +66,9 @@ def store_filtered_data(in_file: str, out_file: str):
 def analyse_data(file, out_file):
 	# Extract only only the fields containing the balls.
 	df = pd.read_csv(file)
-	filtered_df = df.loc[:, df.columns.str.contains("ball", case=False)].select_dtypes(include=['number'])
 
 	# Get sorted numbers for each draw.
-	sorted_df = filtered_df.apply(sorted, axis=1, result_type='broadcast')
+	sorted_df = df.drop("DrawDate", axis=1)
 
 	# Generate most commonly occurring number for each entry.
 	most_freq_balls: pd.DataFrame = sorted_df.mode().iloc[[0]]

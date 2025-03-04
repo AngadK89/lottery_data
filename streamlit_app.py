@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 from lottery import get_stats
 
+# TODO: Split logic up so not all of it has to always be run.
 (draw, filtered_results, analysed_results) = get_stats()
 no_draw_today = not draw
 
