@@ -5,7 +5,7 @@ import datetime
 
 # Get the current draw for today.
 def get_lottery_type():
-	curr_date = datetime.datetime(2025, 3, 2)
+	curr_date = datetime.datetime.today()
 	day = curr_date.weekday()
 	curr_time = curr_date.time()
 
